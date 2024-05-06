@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro | CadFun</title>
+    <link rel="icon" href="./img/adicionar.png">
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="inicio.html">Início</a></li>
+            <li><a href="cadastrar.html">Cadastrar</a></li>
+            <li><a href="visualizar.html">Visualizar</a></li>
+        </ul>
+    </nav>
+    
+    <header>
+        <h2>Área de Cadastro</h2>
+    </header>
+
+    <form id="formulario">
+        <label for="nome">Nome:*</label>
+        <input type="text" name="nome" placeholder="Nome e sobrenome..." required>
+        <label for="cargo">Cargo:*</label>
+        <input type="text" name="cargo" placeholder="Cargo na empresa..." required>
+        <label for="endereco">Endereço:*</label>
+        <input type="text" name="endereco" placeholder="Nome da rua..." required>
+        <label for="telefone">Telefone:*</label>
+        <input type="tel" name="telefone" placeholder="Apenas números..." required>
+        <label for="data_inicio">Inicio do contrato:*</label>
+        <input type="date" name="data_inicio" required>
+        <label for="data_fim">Fim da contratação:*</label>
+        <input type="date" name="data_fim" required>
+        <label for="salario">Salário:*</label>
+        <input type="number" name="salario" placeholder="Ex: 2300..." required>
+        <input type="submit">
+    </form>
+    
+    <script type="module">
+
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+      apiKey: "AIzaSyDS-hGgUUtCsgTiS62WQ7eDeWMHdAem2eE",
+      authDomain: "vendas-online-a3046.firebaseapp.com",
+      projectId: "vendas-online-a3046",
+      storageBucket: "vendas-online-a3046.appspot.com",
+      messagingSenderId: "875469798919",
+      appId: "1:875469798919:web:cfc27cbbde1bf314a8b4a2",
+      measurementId: "G-VVJ1Z3G505"
+    };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        // Initialize Authentication
+        //const auth = getAuth();
+        //const provider = new GoogleAuthProvider();
+
+        // Initialize Firestore
+        const db = getFirestore();
+
+        //Prepara dados do formulario
+        const form = document.getElementById('formulario');
+        
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            //Captura de dados do formulario
+            const formData = new FormData(form);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            //Cria um documento onde os dados inseridos serão guardados
+            try {
+                await addDoc(collection(db, "funcionarios"), data);
+                alert('Registro enviado! :)');
+            } catch (e) {
+                console.error("Erro ao adicionar cadastro: ", e);
+            }
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar | CadFun</title>
+    <link rel="icon" href="./img/visualizar.png">
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="inicio.html">Início</a></li>
+            <li><a href="cadastrar.html">Cadastrar</a></li>
+            <li><a href="visualizar.html">Visualizar</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <h2>Visualizar Cadastros</h2>
+    </header>
+    
+    <div class="tela-exibicao">
+        <button id="exibirRegistrosBtn">Visualizar Banco</button>
+        <table id="tabelaResultados">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Cargo</th>
+                    <th>Endereço</th>
+                    <th>Telefone</th>
+                    <th>Início do contrato</th>
+                    <th>Fim do contrato</th>
+                    <th>Salário</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="dadosTabela">
+                <!-- Dados da tabela serão inseridos aqui -->
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- Inclua o script do Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+        // Configure o Firebase com as credenciais do seu projeto
+        const firebaseConfig = {
+            apiKey: "AIzaSyCoFqrYW5trXf8Ed7QWJQyH9sBe4kF1sAU",
+            authDomain: "banco-online-37fa3.firebaseapp.com",
+            projectId: "banco-online-37fa3",
+            storageBucket: "banco-online-37fa3.appspot.com",
+            messagingSenderId: "133140124129",
+            appId: "1:133140124129:web:65f24e0ab655e1917202a0"
+        };
+    
+        // Inicialize o Firebase
+        firebase.initializeApp(firebaseConfig);
+    
+        // Obtenha uma referência para o Firestore
+        const db = firebase.firestore();
+    
+        // Obtenha uma referência para o botão
+        const exibirRegistrosBtn = document.getElementById('exibirRegistrosBtn');
+        // Obtenha uma referência para o corpo da tabela
+        const corpoTabela = document.getElementById('dadosTabela');
+    
+        // Adicione um ouvinte de evento de clique ao botão
+        exibirRegistrosBtn.addEventListener('click', () => {
+            // Limpe o conteúdo anterior da tabela
+            corpoTabela.innerHTML = "";
+    
+            // Obtenha a referência para a coleção
+            const colecao = db.collection("funcionarios");
+    
+            // Obtenha os documentos da coleção
+            colecao.get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    // Exiba os dados do documento
+                    console.log(doc.id, " => ", doc.data());
+    
+                    // Crie uma nova linha na tabela
+                    const novaLinha = document.createElement("tr");
+    
+                    // Adicione as células com os dados do documento
+                    novaLinha.innerHTML = `
+                        <td>${doc.id}</td>
+                        <td>${doc.data().nome}</td>
+                        <td>${doc.data().cargo}</td>
+                        <td>${doc.data().endereco}</td>
+                        <td>${doc.data().telefone}</td>
+                        <td>${doc.data().data_inicio}</td>
+                        <td>${doc.data().data_fim}</td>
+                        <td>${doc.data().salario}</td>
+                        <td>
+                            <button class="btn-acao-editar" onclick="editarRegistro('${doc.id}')">Editar</button>
+                            <button class="btn-acao-excluir" onclick="excluirRegistro('${doc.id}')">Excluir</button>
+                        </td>
+                    `;
+    
+                    // Adicione a nova linha ao corpo da tabela
+                    corpoTabela.appendChild(novaLinha);
+                });
+            });
+        });
+
+        // Função para excluir um registro
+        function excluirRegistro(id) {
+            // Confirme se o usuário realmente deseja excluir o registro
+            if (confirm("Tem certeza que deseja excluir este registro?")) {
+                // Obtenha uma referência para o documento que será excluído
+                const docRef = db.collection("funcionarios").doc(id);
+    
+                // Exclua o documento
+                docRef.delete().then(() => {
+                    console.log("Documento excluído com sucesso!");
+                    // Atualize a visualização dos registros após a exclusão
+                    exibirRegistrosBtn.click();
+                }).catch((error) => {
+                    console.error("Erro ao excluir documento: ", error);
+                });
+            }
+        }
+
+        // Função para editar um registro
+        function editarRegistro(id) {
+            // Redirecione o usuário para a página de edição com o ID do documento
+            window.location.href = `editar.html?id=${id}`;
+        }
+    </script>
+</body>
+</html>

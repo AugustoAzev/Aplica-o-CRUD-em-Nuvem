@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Cadastro | CadFun</title>
+    <link rel="icon" href="./img/editar.png">
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="inicio.html">Início</a></li>
+            <li><a href="cadastrar.html">Cadastrar</a></li>
+            <li><a href="visualizar.html">Visualizar</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <h2>Editar Cadastro</h2>
+    </header>
+
+    <div class="formulario-edicao">
+        <form id="formEdicao">
+            <label for="nome">Nome:</label>
+            <input type="text" id="nome" name="nome" required><br>
+
+            <label for="cargo">Cargo:</label>
+            <input type="text" id="cargo" name="cargo" required><br>
+
+            <label for="endereco">Endereço:</label>
+            <input type="text" id="endereco" name="endereco" required><br>
+
+            <label for="telefone">Telefone:</label>
+            <input type="text" id="telefone" name="telefone" required><br>
+
+            <label for="data_inicio">Início do contrato:</label>
+            <input type="text" id="data_inicio" name="data_inicio" required><br>
+
+            <label for="data_fim">Fim do contrato:</label>
+            <input type="text" id="data_fim" name="data_fim" required><br>
+
+            <label for="salario">Salário:</label>
+            <input type="text" id="salario" name="salario" required><br>
+
+            <button class="btn-salvar-editar" type="submit">Salvar Alterações</button>
+        </form>
+    </div>
+    
+    <!-- Inclua o script do Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script>
+        //Configure o Firebase com as credenciais do seu projeto
+        const firebaseConfig = {
+            apiKey: "AIzaSyCoFqrYW5trXf8Ed7QWJQyH9sBe4kF1sAU",
+            authDomain: "banco-online-37fa3.firebaseapp.com",
+            projectId: "banco-online-37fa3",
+            storageBucket: "banco-online-37fa3.appspot.com",
+            messagingSenderId: "133140124129",
+            appId: "1:133140124129:web:65f24e0ab655e1917202a0"
+        };
+    
+        //Inicialize o Firebase
+        firebase.initializeApp(firebaseConfig);
+    
+        //Obtenha uma referência para o Firestore
+        const db = firebase.firestore();
+    
+        //Obtenha o ID do registro a ser editado da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const registroId = urlParams.get('id');
+    
+        //Obtenha uma referência para o formulário de edição
+        const formEdicao = document.getElementById('formEdicao');
+    
+        //Preencha o formulário com os dados do registro a ser editado
+        db.collection("funcionarios").doc(registroId).get().then((doc) => {
+            if (doc.exists) {
+                const data = doc.data();
+                formEdicao.nome.value = data.nome;
+                formEdicao.cargo.value = data.cargo;
+                formEdicao.endereco.value = data.endereco;
+                formEdicao.telefone.value = data.telefone;
+                formEdicao.data_inicio.value = data.data_inicio;
+                formEdicao.data_fim.value = data.data_fim;
+                formEdicao.salario.value = data.salario;
+            } else {
+                console.log("Nenhum documento encontrado!");
+            }
+        }).catch((error) => {
+            console.log("Erro ao obter documento:", error);
+        });
+    
+        //Adicione um ouvinte de evento de envio ao formulário
+        formEdicao.addEventListener('submit', (e) => {
+            e.preventDefault(); // Evita que o formulário seja enviado de forma tradicional
+    
+            //Obtenha os dados do formulário
+            const nome = formEdicao.nome.value;
+            const cargo = formEdicao.cargo.value;
+            const endereco = formEdicao.endereco.value;
+            const telefone = formEdicao.telefone.value;
+            const data_inicio = formEdicao.data_inicio.value;
+            const data_fim = formEdicao.data_fim.value;
+            const salario = formEdicao.salario.value;
+    
+            //Atualize os dados do registro no Firestore
+            db.collection("funcionarios").doc(registroId).update({
+                nome: nome,
+                cargo: cargo,
+                endereco: endereco,
+                telefone: telefone,
+                data_inicio: data_inicio,
+                data_fim: data_fim,
+                salario: salario
+            })
+            .then(() => {
+                console.log("Documento atualizado com sucesso!");
+                //Redirecione o usuário de volta à página de visualização após a atualização
+                window.location.href = "visualizar.html";
+            })
+            .catch((error) => {
+                console.error("Erro ao atualizar documento: ", error);
+            });
+        });
+    </script>
+</body>
+</html>
